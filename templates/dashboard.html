@@ -180,33 +180,22 @@
                             <span>Outside allowed hours (7:00 AM – 7:00 PM). Time In is disabled.</span>
                         </div>
 
-                        <!-- Single TIME IN / TIME OUT button -->
-                        {% if not today or not today['time_in'] %}
-                        {# No record today → TIME IN #}
                         <form method="POST" action="{{ url_for('dashboard.time_in') }}" class="dash-action-form" id="timeInForm">
                             <button type="submit" class="dash-btn dash-btn-timein" id="timeInBtn"
-                                {% if not testing_mode and is_weekend %}disabled title="Disabled on weekends"{% endif %}>
+                                {% if not testing_mode and is_weekend %}disabled title="Disabled on weekends"
+                                {% elif today and today['time_in'] %}disabled title="Already timed in today"{% endif %}>
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                 TIME IN
                             </button>
                         </form>
-                        {% elif today['time_in'] and not today['time_out'] %}
-                        {# Already timed in, not yet timed out → TIME OUT #}
                         <form method="POST" action="{{ url_for('dashboard.time_out') }}" class="dash-action-form" id="timeOutForm">
                             <button type="submit" class="dash-btn dash-btn-timeout" id="timeOutBtn"
-                                {% if not testing_mode and is_weekend %}disabled title="Disabled on weekends"{% endif %}>
+                                {% if not testing_mode and is_weekend %}disabled title="Disabled on weekends"
+                                {% elif not today or not today['time_in'] or today['time_out'] %}disabled title="{% if today and today['time_out'] %}Already timed out today{% else %}Time in first{% endif %}"{% endif %}>
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 21 3 21 3 15"/><line x1="14" y1="10" x2="3" y2="21"/></svg>
                                 TIME OUT
                             </button>
                         </form>
-                        {% else %}
-                        {# Already timed in AND timed out → Completed / disabled #}
-                        <button type="button" class="dash-btn dash-btn-timein" disabled title="Session complete for today" style="opacity:0.5;cursor:not-allowed;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            SESSION COMPLETE
-                        </button>
-                        {% endif %}
-
                         <!-- Manual Entry Button -->
                         <button type="button" onclick="openManualEntryModal()" class="dash-btn dash-btn-manual-entry" style="
                         display:inline-flex;align-items:center;gap:8px;
@@ -469,7 +458,7 @@
                                     <td>
                                         <form method="POST" action="{{ url_for('dashboard.delete_record', record_id=r['id']) }}" onsubmit="return confirm('Are you sure you want to delete this record?');">
                                             <button type="submit" class="dash-btn-delete" title="Delete record">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1-2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                             </button>
                                         </form>
                                     </td>
