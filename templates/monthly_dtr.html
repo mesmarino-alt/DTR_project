@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Form No. 48 — Daily Time Record</title>
+    <style>
+        /* ===== BASE RESET & FONT ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            color: #000;
+            background: #fff;
+            line-height: 1.3;
+        }
+
+        /* ===== PAGE CONTAINER ===== */
+        .dtr-page {
+            width: 8.5in;
+            min-height: 11in;
+            margin: 0 auto;
+            padding: 0.4in 0.6in 0.3in 0.6in;
+        }
+
+        /* ===== HEADER ===== */
+        .dtr-header {
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .dtr-header-republic {
+            font-size: 10pt;
+            font-style: italic;
+        }
+
+        .dtr-header-university {
+            font-size: 12pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dtr-header-address {
+            font-size: 10pt;
+            margin-bottom: 10px;
+        }
+
+        .dtr-form-number {
+            font-size: 9pt;
+            font-style: italic;
+            margin-bottom: 2px;
+        }
+
+        .dtr-form-title {
+            font-size: 14pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* ===== HORIZONTAL RULE ===== */
+        .dtr-hr {
+            border: none;
+            border-top: 1.5px solid #000;
+            margin: 4px 0;
+        }
+
+        .dtr-hr-thin {
+            border: none;
+            border-top: 0.5px solid #000;
+            margin: 2px 0;
+        }
+
+        /* ===== EMPLOYEE INFO ===== */
+        .dtr-info-section {
+            margin-bottom: 6px;
+        }
+
+        .dtr-info-row {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 3px;
+        }
+
+        .dtr-info-label {
+            font-size: 10pt;
+            min-width: 50px;
+        }
+
+        .dtr-info-value {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            flex: 1;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding-bottom: 1px;
+            letter-spacing: 0.5px;
+        }
+
+        .dtr-month-row {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 3px;
+        }
+
+        .dtr-month-label {
+            font-size: 10pt;
+        }
+
+        .dtr-month-value {
+            font-size: 11pt;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding-bottom: 1px;
+        }
+
+        /* ===== OFFICE HOURS ===== */
+        .dtr-office-hours {
+            text-align: center;
+            font-size: 9pt;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .dtr-office-hours-title {
+            font-size: 9pt;
+            font-style: italic;
+        }
+
+        .dtr-office-sched {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 9pt;
+            margin-bottom: 4px;
+        }
+
+        .dtr-office-sched span {
+            border-bottom: 1px solid #000;
+            min-width: 80px;
+            display: inline-block;
+            text-align: center;
+            padding-bottom: 1px;
+        }
+
+        /* ===== DTR TABLE ===== */
+        .dtr-table-container {
+            width: 100%;
+            margin-bottom: 6px;
+        }
+
+        .dtr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+
+        .dtr-table th,
+        .dtr-table td {
+            border: 1px solid #000;
+            padding: 1.5px 3px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .dtr-table thead th {
+            font-weight: bold;
+            font-size: 9pt;
+            line-height: 1.2;
+        }
+
+        .dtr-table .col-day {
+            width: 7%;
+        }
+
+        .dtr-table .col-time {
+            width: 14%;
+        }
+
+        .dtr-table .col-undertime {
+            width: 9%;
+        }
+
+        /* Column group headers */
+        .dtr-table .header-group th {
+            padding: 2px 3px;
+            font-size: 9pt;
+        }
+
+        .dtr-table .header-sub th {
+            padding: 2px 3px;
+            font-size: 8.5pt;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        /* Day rows */
+        .dtr-table tbody td {
+            height: 16px;
+            font-size: 9.5pt;
+        }
+
+        .dtr-table tbody td.day-cell {
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        .dtr-table .total-row td {
+            font-weight: bold;
+            font-size: 10pt;
+            height: 20px;
+            border-top: 2px solid #000;
+        }
+
+        /* Weekend/empty styling */
+        .dtr-table tbody tr.weekend-row td {
+            background-color: #f5f5f5;
+        }
+
+        /* ===== CERTIFICATION ===== */
+        .dtr-certification {
+            margin-top: 8px;
+            margin-bottom: 12px;
+            font-size: 9.5pt;
+            text-align: justify;
+            text-indent: 30px;
+            line-height: 1.4;
+        }
+
+        /* ===== SIGNATURE LINES ===== */
+        .dtr-signature-section {
+            margin-top: 20px;
+        }
+
+        .dtr-signature-line {
+            width: 60%;
+            margin: 0 auto;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dtr-sig-blank {
+            border-bottom: 1px solid #000;
+            height: 28px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .dtr-sig-label {
+            font-size: 9pt;
+            font-style: italic;
+        }
+
+        /* ===== VERIFICATION ===== */
+        .dtr-verification {
+            margin-top: 14px;
+            font-size: 9.5pt;
+        }
+
+        .dtr-verification-title {
+            font-style: italic;
+            margin-bottom: 24px;
+        }
+
+        .dtr-verification-line {
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .dtr-verif-blank {
+            border-bottom: 1px solid #000;
+            height: 28px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .dtr-verif-label {
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        /* ===== SCREEN-ONLY UI ===== */
+        .dtr-screen-controls {
+            text-align: center;
+            margin: 20px auto 10px;
+            max-width: 8.5in;
+        }
+
+        .dtr-screen-controls a,
+        .dtr-screen-controls button {
+            display: inline-block;
+            padding: 10px 28px;
+            margin: 0 6px;
+            font-size: 13px;
+            font-family: 'Inter', Arial, sans-serif;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            font-weight: 600;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .dtr-btn-print {
+            background: #2563EB;
+            color: #fff;
+        }
+
+        .dtr-btn-print:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .dtr-btn-back {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .dtr-btn-back:hover {
+            background: #e2e8f0;
+        }
+
+        .dtr-month-nav {
+            text-align: center;
+            margin: 10px auto;
+            max-width: 8.5in;
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        .dtr-month-nav a {
+            color: #2563EB;
+            text-decoration: none;
+            padding: 6px 14px;
+            margin: 0 4px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: background 0.15s;
+        }
+
+        .dtr-month-nav a:hover {
+            background: #eff6ff;
+        }
+
+        .dtr-month-nav .current-month {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.3in 0.4in;
+            }
+
+            body {
+                background: #fff;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .dtr-page {
+                width: 100%;
+                padding: 0;
+                min-height: auto;
+                margin: 0;
+            }
+
+            .dtr-screen-controls,
+            .dtr-month-nav {
+                display: none !important;
+            }
+
+            .dtr-table tbody tr.weekend-row td {
+                background-color: #f5f5f5 !important;
+            }
+
+            .dtr-table th,
+            .dtr-table td {
+                border: 1px solid #000 !important;
+            }
+
+            .dtr-table .total-row td {
+                border-top: 2px solid #000 !important;
+            }
+        }
+
+        /* ===== SCREEN BACKGROUND ===== */
+        @media screen {
+            body {
+                background: #e5e7eb;
+                padding-bottom: 40px;
+            }
+
+            .dtr-page {
+                background: #fff;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+                border-radius: 4px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Screen-only controls -->
+    {% if testing_mode %}
+    <div style="background:#d97706;color:#fff;text-align:center;padding:6px 12px;font-size:13px;font-weight:600;font-family:'Inter',Arial,sans-serif;letter-spacing:0.5px;">
+        🧪 TESTING MODE — This DTR shows test data only. Not for submission.
+    </div>
+    {% endif %}
+    <div class="dtr-screen-controls">
+        <a href="{{ url_for('dashboard.dashboard') }}" class="dtr-btn-back">← Back to Dashboard</a>
+        <button class="dtr-btn-print" onclick="window.print()">🖨 Print DTR</button>
+    </div>
+
+    <div class="dtr-month-nav">
+        <a href="{{ url_for('reports.monthly_dtr', year=prev_year, month=prev_month) }}">◀ Previous</a>
+        <span class="current-month">{{ month_name }} {{ year }}</span>
+        <a href="{{ url_for('reports.monthly_dtr', year=next_year, month=next_month) }}">Next ▶</a>
+    </div>
+
+    <!-- ===== DTR PAGE ===== -->
+    <div class="dtr-page">
+
+        <!-- Header -->
+        <div class="dtr-header">
+            <div class="dtr-header-republic">Republic of the Philippines</div>
+            <div class="dtr-header-university">Catanduanes State University</div>
+            <div class="dtr-header-address">Virac, Catanduanes</div>
+            <hr class="dtr-hr">
+            <div class="dtr-form-number">Civil Service Form No. 48</div>
+            <div class="dtr-form-title">Daily Time Record</div>
+            <hr class="dtr-hr-thin">
+        </div>
+
+        <!-- Employee Info -->
+        <div class="dtr-info-section">
+            <div class="dtr-info-row">
+                <span class="dtr-info-label">Name:</span>
+                <span class="dtr-info-value">{{ employee_name }}</span>
+            </div>
+            <div class="dtr-month-row">
+                <span class="dtr-month-label">For the Month of:</span>
+                <span class="dtr-month-value">{{ month_name }} {{ year }}</span>
+            </div>
+        </div>
+
+        <!-- Office Hours -->
+        <div class="dtr-office-hours">
+            <div class="dtr-office-hours-title">Official hours for arrival and departure</div>
+            <div class="dtr-office-sched">
+                <div>Regular Days: <span>{{ regular_hours or '8:00AM – 5:00PM' }}</span></div>
+                <div>Saturdays: <span>{{ saturday_hours or '____' }}</span></div>
+            </div>
+        </div>
+
+        <!-- DTR Table -->
+        <div class="dtr-table-container">
+            <table class="dtr-table">
+                <thead>
+                    <tr class="header-group">
+                        <th rowspan="3" class="col-day">Day</th>
+                        <th colspan="2">A.M.</th>
+                        <th colspan="2">P.M.</th>
+                        <th colspan="2">Undertime</th>
+                    </tr>
+                    <tr class="header-sub">
+                        <th class="col-time">Arrival</th>
+                        <th class="col-time">Departure</th>
+                        <th class="col-time">Arrival</th>
+                        <th class="col-time">Departure</th>
+                        <th class="col-undertime">Hours</th>
+                        <th class="col-undertime">Minutes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for day_num in range(1, days_in_month + 1) %}
+                    {% set rec = records_by_day.get(day_num) %}
+                    {% set is_weekend = weekdays.get(day_num) in ('Sat', 'Sun') %}
+                    <tr class="{% if is_weekend %}weekend-row{% endif %}">
+                        <td class="day-cell">{{ day_num }}</td>
+                        <td>{{ rec.am_arrival if rec and rec.am_arrival else '' }}</td>
+                        <td>{{ rec.am_departure if rec and rec.am_departure else '' }}</td>
+                        <td>{{ rec.pm_arrival if rec and rec.pm_arrival else '' }}</td>
+                        <td>{{ rec.pm_departure if rec and rec.pm_departure else '' }}</td>
+                        <td>{{ rec.undertime_hours if rec and rec.undertime_hours else '' }}</td>
+                        <td>{{ rec.undertime_minutes if rec and rec.undertime_minutes else '' }}</td>
+                    </tr>
+                    {% endfor %}
+                    <!-- Total Row -->
+                    <tr class="total-row">
+                        <td colspan="5" style="text-align: right; padding-right: 10px;">TOTAL</td>
+                        <td>{{ total_undertime_hours if total_undertime_hours else '' }}</td>
+                        <td>{{ total_undertime_minutes if total_undertime_minutes else '' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Certification -->
+        <div class="dtr-certification">
+            I certify on my honor that the above is a true and correct report of the hours
+            of work performed, record of which was made daily at the time of arrival and
+            departure from office.
+        </div>
+
+        <!-- Signature Line -->
+        <div class="dtr-signature-section">
+            <div class="dtr-signature-line">
+                <span class="dtr-sig-blank"></span>
+                <span class="dtr-sig-label">Signature</span>
+            </div>
+        </div>
+
+        <!-- Verification -->
+        <div class="dtr-verification">
+            <div class="dtr-verification-title">VERIFIED as to the prescribed office hours:</div>
+            <div class="dtr-verification-line">
+                <span class="dtr-verif-blank"></span>
+                <span class="dtr-verif-label">In Charge</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

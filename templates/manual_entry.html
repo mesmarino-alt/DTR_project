@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Add Past Record{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-calendar-plus"></i> Add Daily Record (Manual Entry)</h4>
+                </div>
+                <div class="card-body">
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('manual_entry.manual_entry_submit') }}" id="manualEntryForm">
+                        <input type="hidden" name="employee_id" value="1">
+
+                        <!-- Date -->
+                        <div class="mb-3">
+                            <label for="date" class="form-label fw-bold">Date</label>
+                            <input type="date" class="form-control" id="date" name="date"
+                                   max="{{ today }}" required>
+                            <div class="form-text">Select a past date (before today).</div>
+                        </div>
+
+                        <!-- Time In -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="time_in" class="form-label fw-bold">Time In</label>
+                                <input type="time" class="form-control" id="time_in" name="time_in"
+                                       value="08:00" required>
+                            </div>
+                            <!-- Time Out -->
+                            <div class="col-md-6">
+                                <label for="time_out" class="form-label fw-bold">Time Out</label>
+                                <input type="time" class="form-control" id="time_out" name="time_out"
+                                       value="17:00" required>
+                            </div>
+                        </div>
+
+                        <!-- Hours Preview -->
+                        <div class="mb-3">
+                            <span class="badge bg-info fs-6" id="hoursPreview">Hours: 9.00</span>
+                        </div>
+
+                        <!-- Tasks -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tasks / Accomplishments</label>
+                            <div id="tasksContainer">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">•</span>
+                                    <input type="text" class="form-control" name="tasks"
+                                           placeholder="e.g. Fixed computer cables">
+                                    <button type="button" class="btn btn-outline-danger btn-remove-task" onclick="removeTask(this)" style="display:none;">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addTask()">
+                                <i class="bi bi-plus-circle"></i> Add Task
+                            </button>
+                        </div>
+
+                        <hr>
+
+                        <!-- Submit -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-save"></i> Save Record
+                            </button>
+                            <a href="{{ url_for('manual_entry.manual_entry_history') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-clock-history"></i> View Past Entries
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Fill Section -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Fill — March 1–7, 2026</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Click a date to auto-fill the form:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-01')">Mar 1 (Sun)</button>
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-02')">Mar 2 (Mon)</button>
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-03')">Mar 3 (Tue)</button>
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-04')">Mar 4 (Wed)</button>
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-05')">Mar 5 (Thu)</button>
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-06')">Mar 6 (Fri)</button>
+                        <button class="btn btn-outline-primary" onclick="quickFill('2026-03-07')">Mar 7 (Sat)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addTask() {
+    const container = document.getElementById('tasksContainer');
+    const div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = `
+        <span class="input-group-text">•</span>
+        <input type="text" class="form-control" name="tasks" placeholder="Enter task description">
+        <button type="button" class="btn btn-outline-danger btn-remove-task" onclick="removeTask(this)">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    container.appendChild(div);
+    updateRemoveButtons();
+}
+
+function removeTask(btn) {
+    const container = document.getElementById('tasksContainer');
+    if (container.children.length > 1) {
+        btn.closest('.input-group').remove();
+    }
+    updateRemoveButtons();
+}
+
+function updateRemoveButtons() {
+    const container = document.getElementById('tasksContainer');
+    const buttons = container.querySelectorAll('.btn-remove-task');
+    buttons.forEach(btn => {
+        btn.style.display = container.children.length > 1 ? 'block' : 'none';
+    });
+}
+
+function quickFill(dateStr) {
+    document.getElementById('date').value = dateStr;
+    document.getElementById('time_in').value = '08:00';
+    document.getElementById('time_out').value = '17:00';
+    updateHoursPreview();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateHoursPreview() {
+    const timeIn = document.getElementById('time_in').value;
+    const timeOut = document.getElementById('time_out').value;
+    if (timeIn && timeOut) {
+        const [hIn, mIn] = timeIn.split(':').map(Number);
+        const [hOut, mOut] = timeOut.split(':').map(Number);
+        const diff = (hOut + mOut / 60) - (hIn + mIn / 60);
+        const hours = diff > 0 ? diff.toFixed(2) : '0.00';
+        document.getElementById('hoursPreview').textContent = `Hours: ${hours}`;
+    }
+}
+
+document.getElementById('time_in').addEventListener('change', updateHoursPreview);
+document.getElementById('time_out').addEventListener('change', updateHoursPreview);
+</script>
+{% endblock %}

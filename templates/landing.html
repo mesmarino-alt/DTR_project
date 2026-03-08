@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTR Web App — Automate Your Daily Time Record</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <svg class="nav-logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#logo-grad)"/>
+                    <path d="M9 16L14 21L23 11" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#2563EB"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs>
+                </svg>
+                <span>DTR<span class="logo-accent">App</span></span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#benefits">Benefits</a>
+                <a href="{{ url_for('auth.login') }}" class="nav-btn">Login</a>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero">
+        <div class="hero-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#06B6D4" opacity="0.2"/><circle cx="8" cy="8" r="4" fill="#06B6D4"/></svg>
+                    <span>Trusted by teams & interns everywhere</span>
+                </div>
+                <h1>Automate Your <span class="gradient-text">Daily Time Record</span> Effortlessly</h1>
+                <p class="hero-desc">Say goodbye to manual logbooks. Track time-in and time-out with a single tap, generate weekly DTR reports, and stay organized — all from your browser.</p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Start Time Tracking
+                    </a>
+                    <a href="#preview" class="btn btn-ghost btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        View Demo
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <strong>500+</strong>
+                        <span>Active Users</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <strong>10K+</strong>
+                        <span>Records Logged</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <strong>99.9%</strong>
+                        <span>Uptime</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-mockup">
+                    <div class="mockup-browser">
+                        <div class="browser-bar">
+                            <div class="browser-dots">
+                                <span class="dot dot-red"></span>
+                                <span class="dot dot-yellow"></span>
+                                <span class="dot dot-green"></span>
+                            </div>
+                            <div class="browser-url">dtrapp.io/dashboard</div>
+                        </div>
+                        <div class="browser-body">
+                            <div class="mock-header">
+                                <div class="mock-title">Dashboard</div>
+                                <div class="mock-date">March 7, 2026</div>
+                            </div>
+                            <div class="mock-buttons">
+                                <div class="mock-btn mock-btn-in">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Time In
+                                </div>
+                                <div class="mock-btn mock-btn-out">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 21 3 21 3 15"/><line x1="14" y1="10" x2="3" y2="21"/></svg>
+                                    Time Out
+                                </div>
+                            </div>
+                            <div class="mock-table">
+                                <div class="mock-row mock-row-header">
+                                    <span>Date</span><span>Time In</span><span>Time Out</span><span>Hours</span>
+                                </div>
+                                <div class="mock-row">
+                                    <span>Mon</span><span>8:00 AM</span><span>5:00 PM</span><span class="hours-badge">9h</span>
+                                </div>
+                                <div class="mock-row">
+                                    <span>Tue</span><span>7:55 AM</span><span>5:02 PM</span><span class="hours-badge">9h 7m</span>
+                                </div>
+                                <div class="mock-row">
+                                    <span>Wed</span><span>8:10 AM</span><span>5:15 PM</span><span class="hours-badge">9h 5m</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mockup-phone">
+                        <div class="phone-notch"></div>
+                        <div class="phone-body">
+                            <div class="phone-status">DTR App</div>
+                            <div class="phone-time-display">08:00 AM</div>
+                            <div class="phone-btn-in">✓ Time In Recorded</div>
+                            <div class="phone-today">Today: 0h 0m</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FEATURES SECTION ==================== -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Features</span>
+                <h2>Everything you need to manage your <span class="gradient-text">time records</span></h2>
+                <p>Powerful yet simple tools to make daily time tracking effortless for interns, employees, and organizations.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon icon-blue">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    </div>
+                    <h3>One-Tap Time In / Out</h3>
+                    <p>Record your arrival and departure with a single tap. No complicated forms or manual entries required.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-cyan">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>Automatic Hour Calculation</h3>
+                    <p>The system instantly computes your total work hours each day — no math needed on your end.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-indigo">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <h3>Weekly Printable Report</h3>
+                    <p>Generate clean, print-ready weekly DTR reports in one click for submission or archiving.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-teal">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    </div>
+                    <h3>Mobile Friendly Access</h3>
+                    <p>Fully responsive design works beautifully on any phone, tablet, or laptop browser.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-emerald">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h3>Secure Data Recording</h3>
+                    <p>Your records are safely stored with encrypted authentication. Only you can access your data.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-orange">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3>Prevent Duplicate Entries</h3>
+                    <p>Smart validation ensures you never accidentally record duplicate time-in or time-out entries.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== HOW IT WORKS ==================== -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">How It Works</span>
+                <h2>Get started in <span class="gradient-text">four simple steps</span></h2>
+                <p>From opening the app to generating your weekly report — it's that easy.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <h3>Open the Web App</h3>
+                    <p>Access DTR App from any browser on your phone, tablet, or computer.</p>
+                    <div class="step-connector"></div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <h3>Tap Time In or Out</h3>
+                    <p>One tap to clock in when you arrive, one tap to clock out when you leave.</p>
+                    <div class="step-connector"></div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <h3>Auto-Record Your Time</h3>
+                    <p>The system automatically logs and calculates your total hours — zero effort.</p>
+                    <div class="step-connector"></div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <div class="step-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                    <h3>Generate Weekly DTR</h3>
+                    <p>Download or print your formatted weekly DTR report in one click.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PREVIEW DASHBOARD ==================== -->
+    <section class="preview" id="preview">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Preview</span>
+                <h2>A dashboard designed for <span class="gradient-text">simplicity</span></h2>
+                <p>See how intuitive and clean the DTR App experience really is.</p>
+            </div>
+            <div class="preview-window">
+                <div class="preview-browser-bar">
+                    <div class="browser-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="browser-url">dtrapp.io/dashboard</div>
+                </div>
+                <div class="preview-body">
+                    <div class="preview-sidebar">
+                        <div class="sidebar-logo">
+                            <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="#2563EB"/><path d="M9 16L14 21L23 11" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>DTR App</span>
+                        </div>
+                        <div class="sidebar-menu">
+                            <div class="sidebar-item active">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                Dashboard
+                            </div>
+                            <div class="sidebar-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Records
+                            </div>
+                            <div class="sidebar-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                Reports
+                            </div>
+                            <div class="sidebar-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                Settings
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-main">
+                        <div class="preview-topbar">
+                            <h3>Good Morning, Juan! 👋</h3>
+                            <span class="preview-date">March 7, 2026 — Friday</span>
+                        </div>
+                        <div class="preview-actions">
+                            <button class="preview-action-btn preview-time-in">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                Time In
+                            </button>
+                            <button class="preview-action-btn preview-time-out">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 21 3 21 3 15"/><line x1="14" y1="10" x2="3" y2="21"/></svg>
+                                Time Out
+                            </button>
+                            <button class="preview-action-btn preview-report">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Weekly Report
+                            </button>
+                        </div>
+                        <div class="preview-table">
+                            <div class="preview-table-header">
+                                <span>Date</span><span>Day</span><span>Time In</span><span>Time Out</span><span>Total Hours</span>
+                            </div>
+                            <div class="preview-table-row">
+                                <span>Mar 3</span><span>Mon</span><span>8:00 AM</span><span>5:00 PM</span><span class="hours-badge">9h 0m</span>
+                            </div>
+                            <div class="preview-table-row">
+                                <span>Mar 4</span><span>Tue</span><span>7:55 AM</span><span>5:02 PM</span><span class="hours-badge">9h 7m</span>
+                            </div>
+                            <div class="preview-table-row">
+                                <span>Mar 5</span><span>Wed</span><span>8:10 AM</span><span>5:15 PM</span><span class="hours-badge">9h 5m</span>
+                            </div>
+                            <div class="preview-table-row">
+                                <span>Mar 6</span><span>Thu</span><span>7:50 AM</span><span>4:58 PM</span><span class="hours-badge">9h 8m</span>
+                            </div>
+                            <div class="preview-table-row highlight-row">
+                                <span>Mar 7</span><span>Fri</span><span>8:00 AM</span><span>—</span><span class="hours-badge active-badge">In Progress</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BENEFITS SECTION ==================== -->
+    <section class="benefits" id="benefits">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Benefits</span>
+                <h2>Why teams love <span class="gradient-text">DTR App</span></h2>
+                <p>Built for real workflows — here's what you gain.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#b1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><defs><linearGradient id="b1" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#2563EB"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+                    </div>
+                    <h3>Saves Time</h3>
+                    <p>Stop wasting minutes filling out paper logbooks. Record your time in under 2 seconds.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#b2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/><defs><linearGradient id="b2" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#2563EB"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+                    </div>
+                    <h3>Eliminates Manual DTR</h3>
+                    <p>No more handwritten daily time records. Everything is digitized, accurate, and accessible.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#b3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/><defs><linearGradient id="b3" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#2563EB"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+                    </div>
+                    <h3>Accurate Tracking</h3>
+                    <p>Timestamps are recorded to the exact minute — reliable data you can trust for reports.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#b4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><defs><linearGradient id="b4" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#2563EB"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+                    </div>
+                    <h3>Accessible Anywhere</h3>
+                    <p>Works on any device with a browser — phone, tablet, or laptop. No app install needed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA SECTION ==================== -->
+    <section class="cta">
+        <div class="cta-bg-shapes">
+            <div class="cta-shape cta-shape-1"></div>
+            <div class="cta-shape cta-shape-2"></div>
+        </div>
+        <div class="container cta-content">
+            <h2>Start Tracking Your Work Hours <span class="cta-highlight">Smarter</span></h2>
+            <p>Join hundreds of interns and employees who have switched to automated DTR. It's free, fast, and simple.</p>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-cta btn-lg">
+                Open DTR Dashboard
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="nav-logo">
+                    <svg class="nav-logo-icon" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="url(#flogo)"/><path d="M9 16L14 21L23 11" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="flogo" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#2563EB"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+                    <span>DTR<span class="logo-accent">App</span></span>
+                </a>
+                <p>A simple, efficient, and modern Daily Time Record automation system for interns, employees, and organizations.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#preview">Dashboard Preview</a>
+                <a href="#benefits">Benefits</a>
+            </div>
+            <div class="footer-links">
+                <h4>Account</h4>
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.login') }}">Dashboard</a>
+            </div>
+            <div class="footer-links">
+                <h4>Connect</h4>
+                <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+                <a href="mailto:support@dtrapp.io">Contact Us</a>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 DTR App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile nav toggle
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
+
+        // Close mobile nav on link click
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .step-card, .benefit-card, .preview-window, .section-header').forEach(el => {
+            el.classList.add('animate-target');
+            observer.observe(el);
+        });
+    </script>
+
+</body>
+</html>
