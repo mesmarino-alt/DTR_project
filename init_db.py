@@ -77,9 +77,24 @@ def init_db():
     except sqlite3.IntegrityError:
         print("Admin user already exists.")
 
+
+    print("Database initialized successfully.")
+
+        # Second user
+    user2_username = "Nadine B. Vargas"
+    user2_password = "nadynevrgs"  # change later for security
+    hashed_pw2 = generate_password_hash(user2_password).decode("utf-8")
+
+    try:
+        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user2_username, hashed_pw2))
+        print(f"User '{user2_username}' created successfully.")
+    except sqlite3.IntegrityError:
+        print(f"User '{user2_username}' already exists.")
+
     conn.commit()
     conn.close()
     print("Database initialized successfully.")
+
 
 if __name__ == "__main__":
     init_db()
