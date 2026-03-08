@@ -37,7 +37,7 @@
                     <span>{{ now.strftime('%A, %B %d, %Y') }}</span>
                 </div>
                 <div class="dash-nav-user">
-                    <img src="{{ url_for('static', filename='images/edizon-removebg-preview.png') }}" alt="Profile Photo" class="dash-avatar-img">
+                    
                     <span class="dash-nav-username">{{ current_user.username }}</span>
                 </div>
                 <a href="{{ url_for('auth.logout') }}" class="dash-logout-btn" title="Logout">
