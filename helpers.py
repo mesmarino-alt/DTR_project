@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime, timedelta
 
-TESTING_MODE = True  # Set to True to enable test mode (separate DTR records)
+TESTING_MODE = False  # Set to True to enable test mode (separate DTR records)
 
 # ---------- Office Hours Config ----------
 OFFICE_START_HOUR = 7   # 7:00 AM (early time-in allowed)
