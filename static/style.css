@@ -241,7 +241,7 @@ img {
 }
 
 .nav-links a:hover {
-    color: var(--primary-bright);
+    color: var (--primary-bright);
     background: rgba(37, 99, 235, 0.06);
 }
 
@@ -3089,6 +3089,93 @@ img {
 .dash-page .dash-btn-manual-entry {
     background: linear-gradient(135deg, #ffa31a, #cc8214) !important;
     color: #1b1b1b !important;
+}
+
+/* ---------- Weekly Accomplishment Controls (Dashboard) ---------- */
+.weekly-accom-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 18px auto 22px;
+    max-width: 900px;
+    padding: 8px;
+}
+
+.weekly-accom-controls select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #1b1b1b;
+    color: #ffffff;
+    border: 1.5px solid #3a3a3a;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    min-width: 300px;
+    box-shadow: var(--shadow-sm);
+}
+
+.weekly-accom-controls select:focus {
+    outline: none;
+    border-color: #ffa31a;
+    box-shadow: 0 0 0 4px rgba(255, 163, 26, 0.06);
+}
+
+.weekly-accom-controls button {
+    border: 1px solid transparent;
+    background: transparent;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.weekly-accom-controls button:hover {
+    transform: translateY(-2px);
+}
+
+.weekly-accom-controls .week-nav-btn {
+    background: #333333;
+    border: 1px solid #3a3a3a;
+    color: #cccccc;
+    padding: 8px 12px;
+}
+
+.weekly-accom-controls .week-nav-btn:hover {
+    background: #3a3a3a;
+    color: #ffffff;
+}
+
+.weekly-accom-controls .generate-weekly-btn {
+    background: linear-gradient(135deg, #ffa31a, #cc8214);
+    color: #111111;
+    padding: 10px 16px;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(255, 163, 26, 0.18);
+    border: 1px solid rgba(255, 163, 26, 0.12);
+}
+
+.weekly-accom-controls .generate-weekly-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Small-screen behavior: stack controls */
+@media (max-width: 768px) {
+    .weekly-accom-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 0;
+    }
+    .weekly-accom-controls select { min-width: 100%; }
+    .weekly-accom-controls .week-nav-btn { width: 100%; }
+    .weekly-accom-controls .generate-weekly-btn { width: 100%; }
 }
 
 /* ============================================

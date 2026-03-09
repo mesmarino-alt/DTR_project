@@ -1,0 +1,70 @@
+<div id="weekly-accom-controls" style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+  <button id="prev-week" type="button">◀ Prev</button>
+  <select id="week-select" style="min-width:300px"></select>
+  <button id="next-week" type="button">Next ▶</button>
+  <button id="generate-weekly-pdf" type="button">Generate PDF</button>
+</div>
+
+<script>
+async function loadWeeks(){
+  const sel = document.getElementById('week-select');
+  sel.innerHTML = '<option>Loading...</option>';
+  try {
+    const resp = await fetch('/weekly-accomplishment-weeks', { credentials: 'same-origin' });
+    if (!resp.ok) throw new Error('Failed to fetch weeks');
+    const weeks = await resp.json();
+    sel.innerHTML = '';
+    if (!weeks.length){
+      sel.innerHTML = '<option value="">No weeks available</option>';
+      return;
+    }
+    weeks.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w.start;
+      opt.textContent = w.label;
+      sel.appendChild(opt);
+    });
+    // select latest week by default
+    sel.selectedIndex = weeks.length - 1;
+  } catch (err) {
+    sel.innerHTML = `<option value="">Error loading weeks</option>`;
+    console.error(err);
+  }
+}
+
+document.getElementById('prev-week').addEventListener('click', function(){
+  const sel = document.getElementById('week-select');
+  if (sel.selectedIndex > 0) sel.selectedIndex -= 1;
+});
+
+document.getElementById('next-week').addEventListener('click', function(){
+  const sel = document.getElementById('week-select');
+  if (sel.selectedIndex < sel.options.length - 1) sel.selectedIndex += 1;
+});
+
+document.getElementById('generate-weekly-pdf').addEventListener('click', async function(){
+  const sel = document.getElementById('week-select');
+  const monday = sel.value;
+  if (!monday) return alert('No week selected');
+  const url = `/weekly-accomplishment-pdf?week_start=${encodeURIComponent(monday)}`;
+  try {
+    const resp = await fetch(url, { credentials: 'same-origin' });
+    if (!resp.ok) throw new Error('Failed to generate PDF');
+    const blob = await resp.blob();
+    const cd = resp.headers.get('Content-Disposition') || '';
+    const filename = (cd.match(/filename=(.+)/) ? cd.match(/filename=(.+)/)[1] : `Weekly_Accomplishment_${monday}.pdf`).replace(/"/g,'');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+});
+
+// initialize
+loadWeeks();
+</script>

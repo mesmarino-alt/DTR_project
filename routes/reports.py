@@ -1,7 +1,7 @@
 import io
 import calendar
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, send_file
+from flask import Blueprint, render_template, send_file, request, jsonify
 from flask_login import login_required, current_user
 from fpdf import FPDF
 
@@ -28,11 +28,64 @@ def sanitize_for_pdf(text):
     return text
 
 
+@reports_bp.route("/weekly-accomplishment-weeks")
+@login_required
+def weekly_accomplishment_weeks():
+    """
+    Returns JSON list of weeks (Monday..Sunday) that have DTR rows for current_user.
+    Each item: { start: "YYYY-MM-DD", end: "YYYY-MM-DD", label: "Mon DD, YYYY - Sun DD, YYYY" }
+    """
+    test_flag = 1 if TESTING_MODE else 0
+    conn = get_db()
+    try:
+        row = conn.execute(
+            "SELECT MIN(date) AS min_date, MAX(date) AS max_date FROM dtr WHERE user_id = ? AND is_test = ?",
+            (current_user.id, test_flag)
+        ).fetchone()
+
+        if not row or not row["min_date"]:
+            return jsonify([])
+
+        min_date = datetime.strptime(row["min_date"], "%Y-%m-%d").date()
+        max_date = datetime.strptime(row["max_date"], "%Y-%m-%d").date()
+
+        first_monday = min_date - timedelta(days=min_date.weekday())
+        weeks = []
+        cur = first_monday
+        while cur <= max_date:
+            start = cur
+            end = cur + timedelta(days=6)
+            label = f"{start.strftime('%b %d, %Y')} - {end.strftime('%b %d, %Y')}"
+            weeks.append({
+                "start": start.strftime("%Y-%m-%d"),
+                "end": end.strftime("%Y-%m-%d"),
+                "label": label
+            })
+            cur += timedelta(days=7)
+        return jsonify(weeks)
+    finally:
+        conn.close()
+
+
 @reports_bp.route("/weekly-accomplishment-pdf")
 @login_required
 def weekly_accomplishment_pdf():
+    """
+    Generate weekly accomplishment PDF for an optional week_start query param (YYYY-MM-DD).
+    If week_start is not provided or invalid, use current Manila week.
+    """
     now = get_manila_now()
-    week_start = now - timedelta(days=now.weekday())
+
+    week_param = request.args.get('week_start')
+    if week_param:
+        try:
+            parsed = datetime.strptime(week_param, "%Y-%m-%d")
+            week_start = parsed - timedelta(days=parsed.weekday())
+        except Exception:
+            week_start = now - timedelta(days=now.weekday())
+    else:
+        week_start = now - timedelta(days=now.weekday())
+
     week_end = week_start + timedelta(days=6)
     week_start_str = week_start.strftime("%Y-%m-%d")
     week_end_str = week_end.strftime("%Y-%m-%d")
@@ -45,7 +98,7 @@ def weekly_accomplishment_pdf():
     ).fetchall()
     conn.close()
 
-    # Build the PDF
+    # Build the PDF (reuse existing layout)
     pdf = FPDF(orientation='P', unit='mm', format='A4')
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=20)
@@ -231,9 +284,9 @@ def weekly_accomplishment_pdf():
         pdf.add_page()
         pdf.set_y(15)
 
-    total_hours = sum(r["total_hours"] for r in records if r["total_hours"])
-    days_with_activities = sum(1 for r in records if r["activities"] and r["activities"].strip())
-    days_worked = sum(1 for r in records if r["total_hours"])
+    total_hours = sum(r["total_hours"] for r in records if r["total_hours"]) if records else 0
+    days_with_activities = sum(1 for r in records if r["activities"] and r["activities"].strip()) if records else 0
+    days_worked = sum(1 for r in records if r["total_hours"]) if records else 0
 
     pdf.set_y(pdf.get_y() + 5)
     summary_y = pdf.get_y()
@@ -286,33 +339,13 @@ def weekly_accomplishment_pdf():
     )
 
 
-# @reports_bp.route("/weekly-report")
-# @login_required
-# def weekly_report():
-#     now = get_manila_now()
-#     week_start = now - timedelta(days=now.weekday())
-#     week_start_str = week_start.strftime("%Y-%m-%d")
-#     week_end_str = (week_start + timedelta(days=6)).strftime("%Y-%m-%d")
-#     test_flag = 1 if TESTING_MODE else 0
-
-#     conn = get_db()
-#     records = conn.execute(
-#         "SELECT * FROM dtr WHERE user_id=? AND date >= ? AND date <= ? AND is_test=? ORDER BY date ASC",
-#         (current_user.id, week_start_str, week_end_str, test_flag)
-#     ).fetchall()
-#     conn.close()
-
-#     total_hours = sum(r["total_hours"] for r in records if r["total_hours"])
-
-#     return render_template("weekly_report.html",
-#         records=records,
-#         total_hours=round(total_hours, 2),
-#         week_start=week_start.strftime("%B %d, %Y"),
-#         week_end=(week_start + timedelta(days=6)).strftime("%B %d, %Y"),
-#         username=current_user.username,
-#         generated=now.strftime("%B %d, %Y %I:%M %p"),
-#         testing_mode=TESTING_MODE
-#     )
+@reports_bp.route("/weekly-accomplishment")
+@login_required
+def weekly_accomplishment():
+    """
+    Page with dropdown / prev-next and Generate PDF button to download any week's PDF (including past records).
+    """
+    return render_template("weekly_accomplishment.html")
 
 
 @reports_bp.route("/monthly-dtr")

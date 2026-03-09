@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime, timedelta
 
-TESTING_MODE = False  # Set to True to enable test mode (separate DTR records)
+TESTING_MODE = True  # Set to True to enable test mode (separate DTR records)
 
 # ---------- Office Hours Config ----------
 OFFICE_START_HOUR = 7   # 7:00 AM (early time-in allowed)
@@ -110,3 +110,62 @@ def get_tasks_for_record(record_id):
     ).fetchall()
     db.close()
     return tasks
+
+#generate_weekly_accomplishment
+def generate_weekly_accomplishment(user_id, week_start_date=None):
+    """
+    Build a weekly accomplishment summary for the given user and week.
+    - week_start_date: None (use current Manila week starting Monday) or "YYYY-MM-DD" or datetime.date/datetime.
+    - Returns (start_date_str, end_date_str, accomplishment_text)
+    """
+    is_test = 1 if TESTING_MODE else 0
+
+    # determine week start (Monday) and end (Sunday) in Manila time
+    if week_start_date is None:
+        now = get_manila_now()
+        week_start = (now - timedelta(days=now.weekday())).date()
+    elif isinstance(week_start_date, str):
+        try:
+            week_start = datetime.strptime(week_start_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValueError("week_start_date must be YYYY-MM-DD when passed as string")
+    elif isinstance(week_start_date, datetime):
+        week_start = week_start_date.date()
+    else:
+        week_start = week_start_date  # assume date-like
+
+    week_end = week_start + timedelta(days=6)
+    start_str = week_start.strftime("%Y-%m-%d")
+    end_str = week_end.strftime("%Y-%m-%d")
+
+    db = get_db()
+    try:
+        rows = db.execute(
+            "SELECT * FROM dtr WHERE user_id = ? AND date BETWEEN ? AND ? AND is_test = ? ORDER BY date",
+            (user_id, start_str, end_str, is_test)
+        ).fetchall()
+
+        if not rows:
+            return start_str, end_str, "No records found for this week."
+
+        lines = []
+        for r in rows:
+            date = r["date"]
+            time_in = r.get("time_in") or ""
+            time_out = r.get("time_out") or ""
+            hours = r.get("total_hours") or 0
+            activities = r.get("activities") or ""
+
+            # If activities is empty, pull tasks for the record (keeps older task entries)
+            if not activities:
+                tasks = get_tasks_for_record(r["id"])
+                if tasks:
+                    activities = "\n".join("• " + t["task_description"] for t in tasks)
+
+            day_block = f"{date} — {hours}h\n{activities}".strip()
+            lines.append(day_block)
+
+        accomplishment_text = "\n\n".join(lines)
+        return start_str, end_str, accomplishment_text
+    finally:
+        db.close()
