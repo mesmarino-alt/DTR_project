@@ -1,69 +1,77 @@
-import sqlite3
+import psycopg2
+from psycopg2 import sql
 from flask_bcrypt import generate_password_hash
+import os
 
 def init_db():
-    conn = sqlite3.connect("database.db")
-    c = conn.cursor()
+    conn = psycopg2.connect(
+        host="aws-1-ap-northeast-1.pooler.supabase.com",
+        database="postgres",
+        user="postgres.gkdbzfrzyalndahgulsm",
+        password="edizonmarino_112717",
+        port=6543
+    )
+    cur = conn.cursor()
 
     # Users table
-    c.execute("""
+    cur.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL
     )
     """)
 
     # DTR table — linked to users
-    c.execute("""
+    cur.execute("""
     CREATE TABLE IF NOT EXISTS dtr (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL,
-        date TEXT,
-        time_in TEXT,
-        time_out TEXT,
+        date DATE,
+        time_in TIME,
+        time_out TIME,
         total_hours REAL,
         activities TEXT DEFAULT '',
-        created_at TEXT,
-        is_test INTEGER DEFAULT 0,
-        is_manual INTEGER DEFAULT 0,
+        created_at TIMESTAMP,
+        is_test BOOLEAN DEFAULT FALSE,
+        is_manual BOOLEAN DEFAULT FALSE,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )
     """)
 
     # Employees table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS employees (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            position TEXT,
-            department TEXT
-        )
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS employees (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        position VARCHAR(255),
+        department VARCHAR(255)
+    )
     """)
 
     # DTR records table
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS dtr_records (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            employee_id INTEGER,
-            date TEXT NOT NULL,
-            time_in TEXT,
-            time_out TEXT,
-            hours REAL DEFAULT 0,
-            is_manual INTEGER DEFAULT 0,
-            testing INTEGER DEFAULT 0,
-            FOREIGN KEY (employee_id) REFERENCES employees(id)
-        )
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS dtr_records (
+        id SERIAL PRIMARY KEY,
+        employee_id INTEGER,
+        date DATE NOT NULL,
+        time_in TIME,
+        time_out TIME,
+        hours REAL DEFAULT 0,
+        is_manual BOOLEAN DEFAULT FALSE,
+        testing BOOLEAN DEFAULT FALSE,
+        FOREIGN KEY (employee_id) REFERENCES employees(id)
+    )
     """)
 
     # Tasks table (multiple tasks per record)
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            record_id INTEGER NOT NULL,
-            task_description TEXT NOT NULL,
-            FOREIGN KEY (record_id) REFERENCES dtr_records(id)
-        )
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS tasks (
+        id SERIAL PRIMARY KEY,
+        record_id INTEGER NOT NULL,
+        task_description TEXT NOT NULL,
+        FOREIGN KEY (record_id) REFERENCES dtr_records(id)
+    )
     """)
 
     # Preload admin user
@@ -72,29 +80,46 @@ def init_db():
     hashed_pw = generate_password_hash(admin_password).decode("utf-8")
 
     try:
-        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (admin_username, hashed_pw))
+        cur.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s) ON CONFLICT (username) DO NOTHING",
+            (admin_username, hashed_pw)
+        )
         print("Admin user created successfully.")
-    except sqlite3.IntegrityError:
-        print("Admin user already exists.")
+    except Exception as e:
+        print(f"Error creating admin user: {e}")
 
-
-    print("Database initialized successfully.")
-
-        # Second user
+    # Second user
     user2_username = "Nadine B. Vargas"
     user2_password = "nadynevrgs"  # change later for security
     hashed_pw2 = generate_password_hash(user2_password).decode("utf-8")
 
     try:
-        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user2_username, hashed_pw2))
+        cur.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s) ON CONFLICT (username) DO NOTHING",
+            (user2_username, hashed_pw2)
+        )
         print(f"User '{user2_username}' created successfully.")
-    except sqlite3.IntegrityError:
-        print(f"User '{user2_username}' already exists.")
+    except Exception as e:
+        print(f"Error creating user '{user2_username}': {e}")
+
+    # Add a default employee for testing
+    try:
+        cur.execute(
+            "INSERT INTO employees (id, name, position, department) VALUES (%s, %s, %s, %s) ON CONFLICT (id) DO NOTHING",
+            (1, "Default Employee", "Tester", "Development")
+        )
+        print("Default employee added successfully.")
+    except Exception as e:
+        print(f"Error adding default employee: {e}")
 
     conn.commit()
+    cur.close()
     conn.close()
     print("Database initialized successfully.")
 
 
 if __name__ == "__main__":
-    init_db()
+    if os.environ.get("RUN_INIT_DB") == "1":
+        init_db()
+    else:
+        print("RUN_INIT_DB not set — skipping DB initialization.")

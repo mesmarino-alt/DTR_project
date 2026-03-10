@@ -2,11 +2,16 @@ import os
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin
+import psycopg2
+import psycopg2.extras
 
 from helpers import get_db
 from routes import register_blueprints
+from routes.health import health_bp
 
 app = Flask(__name__)
+# DATABASE CONFIGURATION
+
 app.secret_key = "supersecretkey"
 
 bcrypt = Bcrypt(app)
@@ -25,8 +30,14 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db()
-    row = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    row = cur.fetchone()
+
+    cur.close()
     conn.close()
+
     if row:
         return User(row["id"], row["username"], row["password"])
     return None
@@ -34,6 +45,7 @@ def load_user(user_id):
 
 # ---------- Register Blueprints ----------
 register_blueprints(app)
+app.register_blueprint(health_bp)
 
 
 if __name__ == "__main__":

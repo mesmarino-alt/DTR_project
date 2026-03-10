@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, send_file, request, jsonify
 from flask_login import login_required, current_user
 from fpdf import FPDF
+import psycopg2
+import psycopg2.extras
 
 from helpers import get_db, get_manila_now, TESTING_MODE
 
@@ -89,13 +91,18 @@ def weekly_accomplishment_pdf():
     week_end = week_start + timedelta(days=6)
     week_start_str = week_start.strftime("%Y-%m-%d")
     week_end_str = week_end.strftime("%Y-%m-%d")
-    test_flag = 1 if TESTING_MODE else 0
+    test_flag = True if TESTING_MODE else False
 
     conn = get_db()
-    records = conn.execute(
-        "SELECT * FROM dtr WHERE user_id=? AND date >= ? AND date <= ? AND is_test=? ORDER BY date ASC",
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cur.execute(
+        "SELECT * FROM dtr WHERE user_id = %s AND date >= %s AND date <= %s AND is_test = %s ORDER BY date ASC",
         (current_user.id, week_start_str, week_end_str, test_flag)
-    ).fetchall()
+    )
+    records = cur.fetchall()
+
+    cur.close()
     conn.close()
 
     # Build the PDF (reuse existing layout)
@@ -339,6 +346,7 @@ def weekly_accomplishment_pdf():
     )
 
 
+<<<<<<< Updated upstream
 @reports_bp.route("/weekly-accomplishment")
 @login_required
 def weekly_accomplishment():
@@ -348,6 +356,8 @@ def weekly_accomplishment():
     return render_template("weekly_accomplishment.html")
 
 
+=======
+>>>>>>> Stashed changes
 @reports_bp.route("/monthly-dtr")
 @reports_bp.route("/monthly-dtr/<int:year>/<int:month>")
 @login_required
@@ -381,13 +391,18 @@ def monthly_dtr(year=None, month=None):
 
     start_date = f"{year}-{month:02d}-01"
     end_date = f"{year}-{month:02d}-{days_in_month:02d}"
-    test_flag = 1 if TESTING_MODE else 0
+    test_flag = True if TESTING_MODE else False
 
     conn = get_db()
-    rows = conn.execute(
-        "SELECT * FROM dtr WHERE user_id=? AND date >= ? AND date <= ? AND is_test=? ORDER BY date ASC",
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cur.execute(
+        "SELECT * FROM dtr WHERE user_id = %s AND date >= %s AND date <= %s AND is_test = %s ORDER BY date ASC",
         (current_user.id, start_date, end_date, test_flag)
-    ).fetchall()
+    )
+    rows = cur.fetchall()
+
+    cur.close()
     conn.close()
 
     weekdays = {}

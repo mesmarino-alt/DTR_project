@@ -1,3 +1,11 @@
+import os
+import sys
+
+# Prevent accidental runs in production environments
+if os.environ.get("ALLOW_DB_TEST") != "1":
+    print("DB test disabled. Set ALLOW_DB_TEST=1 to run this diagnostic.")
+    sys.exit(0)
+
 from helpers import get_db
 
 conn = get_db()

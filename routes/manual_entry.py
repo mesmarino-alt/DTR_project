@@ -4,6 +4,8 @@ from helpers import (
     get_manila_now, insert_manual_record, TESTING_MODE,
     get_db, get_tasks_for_record
 )
+import psycopg2
+import psycopg2.extras
 
 manual_entry_bp = Blueprint("manual_entry", __name__, url_prefix="/dashboard")
 
@@ -57,14 +59,19 @@ def manual_entry_history():
     user_id = current_user.id
     is_test = 1 if TESTING_MODE else 0
 
-    db = get_db()
-    records = db.execute(
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(
         """SELECT * FROM dtr
-           WHERE user_id = ? AND is_manual = 1 AND is_test = ?
+           WHERE user_id = %s AND is_manual = 1 AND is_test = %s
            ORDER BY date DESC""",
         (user_id, is_test)
-    ).fetchall()
-    db.close()
+    )
+    records = cur.fetchall()
+
+    cur.close()
+    conn.close()
 
     # Attach tasks to each record
     records_with_tasks = []

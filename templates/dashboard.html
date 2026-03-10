@@ -437,17 +437,10 @@
                                 {% set rd = r['date'] %}
                                 <tr class="{% if rd == today_str %}dash-row-today{% endif %}">
                                     <td class="dash-td-date">
-                                        {% if rd %}
-                                        {% set d = rd.split('-') %}
-                                        {{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d[1]|int - 1] }} {{ d[2]|int }}
-                                        {% endif %}
+                                        {{ r['display_date'] if r['display_date'] else '—' }}
                                     </td>
                                     <td>
-                                        {% if rd %}
-                                        {% set parts = rd.split('-') %}
-                                        {% set dt_obj = None %}
-                                        {{ ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][(parts[0]|int * 365 + parts[1]|int * 30 + parts[2]|int + 1) % 7] }}
-                                        {% endif %}
+                                        {{ r['weekday'] if r['weekday'] else '—' }}
                                     </td>
                                     <td><span class="dash-time-pill dash-time-pill-green">{{ r['time_in'] or '—' }}</span></td>
                                     <td><span class="dash-time-pill dash-time-pill-red">{{ r['time_out'] or '—' }}</span></td>
