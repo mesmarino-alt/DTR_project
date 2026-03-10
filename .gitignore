@@ -1,0 +1,47 @@
+# Local database files
+database.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment / secrets
+.env
+.env.*
+secrets.json
+
+# Python cache / artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Logs
+*.log
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Coverage / testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Misc
+.mypy_cache/
+*.tar.gz
+node_modules/
+
+# Diagnostics scripts (optional to ignore if you do not want them in the repo)
+# test_db.py
+# check_db.py
