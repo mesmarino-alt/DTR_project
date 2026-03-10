@@ -3,14 +3,22 @@ from psycopg2 import sql
 from flask_bcrypt import generate_password_hash
 import os
 
+
 def init_db():
-    conn = psycopg2.connect(
-        host="aws-1-ap-northeast-1.pooler.supabase.com",
-        database="postgres",
-        user="postgres.gkdbzfrzyalndahgulsm",
-        password="edizonmarino_112717",
-        port=6543
-    )
+    # Prefer DATABASE_URL if provided
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url:
+        print("Initializing DB using DATABASE_URL from environment")
+        conn = psycopg2.connect(db_url)
+    else:
+        host = os.environ.get("DB_HOST", "aws-1-ap-northeast-1.pooler.supabase.com")
+        database = os.environ.get("DB_NAME", "postgres")
+        user = os.environ.get("DB_USER", "postgres.gkdbzfrzyalndahgulsm")
+        password = os.environ.get("DB_PASS", "edizonmarino_112717")
+        port = int(os.environ.get("DB_PORT", 6543))
+        print(f"Initializing DB using host={host} port={port}")
+        conn = psycopg2.connect(host=host, database=database, user=user, password=password, port=port)
+
     cur = conn.cursor()
 
     # Users table
@@ -75,8 +83,8 @@ def init_db():
     """)
 
     # Preload admin user
-    admin_username = "Mark Edizon S. Marino"
-    admin_password = "kaiju112717"  # change later for security
+    admin_username = os.environ.get("INIT_ADMIN_USER", "Mark Edizon S. Marino")
+    admin_password = os.environ.get("INIT_ADMIN_PASS", "kaiju112717")  # recommend override via env
     hashed_pw = generate_password_hash(admin_password).decode("utf-8")
 
     try:
@@ -84,13 +92,13 @@ def init_db():
             "INSERT INTO users (username, password) VALUES (%s, %s) ON CONFLICT (username) DO NOTHING",
             (admin_username, hashed_pw)
         )
-        print("Admin user created successfully.")
+        print("Admin user created successfully (or already existed).")
     except Exception as e:
         print(f"Error creating admin user: {e}")
 
     # Second user
-    user2_username = "Nadine B. Vargas"
-    user2_password = "nadynevrgs"  # change later for security
+    user2_username = os.environ.get("INIT_USER2", "Nadine B. Vargas")
+    user2_password = os.environ.get("INIT_USER2_PASS", "nadynevrgs")
     hashed_pw2 = generate_password_hash(user2_password).decode("utf-8")
 
     try:
@@ -98,7 +106,7 @@ def init_db():
             "INSERT INTO users (username, password) VALUES (%s, %s) ON CONFLICT (username) DO NOTHING",
             (user2_username, hashed_pw2)
         )
-        print(f"User '{user2_username}' created successfully.")
+        print(f"User '{user2_username}' created successfully (or already existed).")
     except Exception as e:
         print(f"Error creating user '{user2_username}': {e}")
 
@@ -106,9 +114,9 @@ def init_db():
     try:
         cur.execute(
             "INSERT INTO employees (id, name, position, department) VALUES (%s, %s, %s, %s) ON CONFLICT (id) DO NOTHING",
-            (1, "Default Employee", "Tester", "Development")
+            (1, os.environ.get("INIT_EMP_NAME", "Default Employee"), os.environ.get("INIT_EMP_POS", "Tester"), os.environ.get("INIT_EMP_DEPT", "Development"))
         )
-        print("Default employee added successfully.")
+        print("Default employee added successfully (or already existed).")
     except Exception as e:
         print(f"Error adding default employee: {e}")
 

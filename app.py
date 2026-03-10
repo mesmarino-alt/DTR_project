@@ -12,7 +12,19 @@ from routes.health import health_bp
 app = Flask(__name__)
 # DATABASE CONFIGURATION
 
-app.secret_key = "supersecretkey"
+app.secret_key = os.environ.get("APP_SECRET", "supersecretkey")
+
+# Log DB source at startup for clarity in deployment logs
+_db_url = os.environ.get("DATABASE_URL")
+_db_host = os.environ.get("DB_HOST")
+if _db_url:
+    print("Startup: using DATABASE_URL (external Postgres/Supabase)")
+elif _db_host:
+    print(f"Startup: using DB_HOST={_db_host} (external Postgres)")
+elif os.path.exists("database.db"):
+    print("Startup: no DATABASE_URL/DB_* found — database.db exists, app may use local SQLite")
+else:
+    print("Startup: no DB configuration found in env — app will attempt default connection settings")
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
