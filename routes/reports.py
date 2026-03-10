@@ -346,7 +346,6 @@ def weekly_accomplishment_pdf():
     )
 
 
-<<<<<<< Updated upstream
 @reports_bp.route("/weekly-accomplishment")
 @login_required
 def weekly_accomplishment():
@@ -356,8 +355,6 @@ def weekly_accomplishment():
     return render_template("weekly_accomplishment.html")
 
 
-=======
->>>>>>> Stashed changes
 @reports_bp.route("/monthly-dtr")
 @reports_bp.route("/monthly-dtr/<int:year>/<int:month>")
 @login_required
